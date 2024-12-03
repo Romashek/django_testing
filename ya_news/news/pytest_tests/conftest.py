@@ -41,8 +41,7 @@ def news(author):
     """Создает новость, связанную с автором."""
     return News.objects.create(
         title='Заголовок',
-        text='Текст news',
-        author=author
+        text='Текст news'
     )
 
 
