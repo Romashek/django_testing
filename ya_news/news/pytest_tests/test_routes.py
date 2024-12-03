@@ -5,7 +5,6 @@ from django.urls import reverse
 from pytest_django.asserts import assertRedirects
 
 
-
 @pytest.mark.django_db
 @pytest.mark.parametrize(
     'name',
@@ -14,16 +13,19 @@ from pytest_django.asserts import assertRedirects
 def test_pages_availability_for_anonymous_user(client, name):
     url = reverse(name)
     response = client.get(url)
-    assert response.status_code == HTTPStatus.OK 
+    assert response.status_code == HTTPStatus.OK
+
 
 @pytest.mark.django_db
 def test_news_detail_page_accessible_to_anonymous_user(client, news):
-    url = reverse('news:detail', args=[news.id])  
+    url = reverse('news:detail', args=[news.id])
     response = client.get(url)
     assert response.status_code == HTTPStatus.OK
 
+
 @pytest.mark.parametrize(
-    'name',('news:delete', 'news:edit'),
+    'name',
+    ('news:delete', 'news:edit'),
 )
 def test_delete_edit_to_author(comment, author_client, name):
     url = reverse(name, args=(comment.id,))
@@ -59,7 +61,6 @@ def test_pages_availability_for_different_users(
 )
 def test_redirects(client, name, args):
     login_url = reverse('users:login')
-    
     url = reverse(name, args=(args.id,))
     expected_url = f'{login_url}?next={url}'
     response = client.get(url)
