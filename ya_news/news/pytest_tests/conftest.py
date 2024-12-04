@@ -1,11 +1,12 @@
-import pytest
 from datetime import datetime, timedelta
 
-from django.test.client import Client
+import pytest
 from django.conf import settings
+from django.urls import reverse
+from django.test.client import Client
 from django.utils import timezone
 
-from news.models import News, Comment
+from news.models import Comment, News
 
 
 @pytest.fixture
@@ -25,6 +26,7 @@ def author_client(author):
     """Создает клиент для авторизованного пользователя."""
     client = Client()
     client.force_login(author)
+    client.user = author
     return client
 
 
@@ -33,6 +35,7 @@ def not_author_client(not_author):
     """Создает клиент для неавторизованного пользователя."""
     client = Client()
     client.force_login(not_author)
+    client.user = not_author
     return client
 
 
@@ -83,6 +86,28 @@ def many_comments(author, news):
 
 
 @pytest.fixture
-def form_data():
-    """Возвращает данные формы для комментария."""
-    return {'text': settings.COMMENT_TEXT}
+def get_detail_url():
+    def _get_detail_url(news):
+        return reverse('news:detail', args=(news.id,))
+    return _get_detail_url
+
+
+@pytest.fixture
+def get_delete_url():
+    def _get_delete_url(news):
+        return reverse('news:delete', args=(news.id,))
+    return _get_delete_url
+
+
+@pytest.fixture
+def get_edit_url():
+    def _get_edit_url(news):
+        return reverse('news:edit', args=(news.id,))
+    return _get_edit_url
+
+
+@pytest.fixture
+def get_home_url():
+    def _get_home_url():
+        return reverse('news:home')
+    return _get_home_url

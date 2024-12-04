@@ -1,6 +1,6 @@
-# test_routes.py
 from http import HTTPStatus
 import pytest
+
 from django.urls import reverse
 from pytest_django.asserts import assertRedirects
 
@@ -17,8 +17,9 @@ def test_pages_availability_for_anonymous_user(client, name):
 
 
 @pytest.mark.django_db
-def test_news_detail_page_accessible_to_anonymous_user(client, news):
-    url = reverse('news:detail', args=[news.id])
+def test_news_detail_page_accessible_to_anonymous_user(client,
+                                                       get_detail_url, news):
+    url = get_detail_url(news)
     response = client.get(url)
     assert response.status_code == HTTPStatus.OK
 
