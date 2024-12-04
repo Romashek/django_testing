@@ -6,6 +6,7 @@ from notes.models import Note
 
 User = get_user_model()
 
+
 class BaseTestCase(TestCase):
     """Базовый класс для тестов заметок."""
 
@@ -35,7 +36,7 @@ class BaseTestCase(TestCase):
         cls.reader_client = Client()
         cls.reader_client.force_login(cls.user2)
         cls.url_list = reverse('notes:list')
-        cls.NOTES_COUNT =  Note.objects.count()
+        cls.NOTES_COUNT = Note.objects.count()
 
     def get_url(self, name, *args):
         """Утилита для получения URL по имени."""

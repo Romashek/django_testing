@@ -1,6 +1,5 @@
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
-from django.test import Client, TestCase
+from django.test import Client
 from django.urls import reverse
 from http import HTTPStatus
 from pytils.translit import slugify
@@ -35,7 +34,7 @@ class TestNoteCreation(BaseTestCase):
         """Проверяет, что авторизованный пользователь может создать заметку."""
         self.author_client.post(self.url_add, data=self.form_data)
         notes_count = Note.objects.count()
-        self.assertEqual(notes_count, self.NOTES_COUNT+1)
+        self.assertEqual(notes_count, self.NOTES_COUNT + 1)
         note = Note.objects.get(slug=self.form_data['slug'])
         self.assertEqual(note.title, self.form_data['title'])
         self.assertEqual(note.text, self.form_data['text'])
@@ -43,20 +42,25 @@ class TestNoteCreation(BaseTestCase):
     def test_cant_create_same_slug(self):
         """Проверяет, что нельзя создать заметку с дублирующимся slug."""
         response = self.author_client.post(reverse('notes:add'), data={
-        'title': 'Second Note',
-        'text': 'This is the second note.',
-        'slug': 'travel'})
+            'title': 'Second Note',
+            'text': 'This is the second note.',
+            'slug': 'travel'})
 
-        self.assertFormError(response, 'form', 'slug', 
-                         f'{self.note.slug} - такой slug уже существует, придумайте уникальное значение!')
+        self.assertFormError(
+            response,
+            'form',
+            'slug',
+            f'{self.note.slug} - такой slug уже существует, '
+            'придумайте уникальное значение!'
+        )
 
     def test_if_not_slug(self):
         title = 'Note'
         form_data = {
-        'title': title,
-        'text': 'This is the note without slug.',
-        'slug': ''}
-        response = self.author_client.post(self.url_add, data=form_data)
+            'title': title,
+            'text': 'This is the note without slug.',
+            'slug': ''}
+        self.author_client.post(self.url_add, data=form_data)
         note = Note.objects.get(title=title)
         expected_slug = slugify(title)
         self.assertEqual(expected_slug, note.slug)
@@ -102,7 +106,7 @@ class TestNoteEditDelete(BaseTestCase):
         response = self.reader_client.delete(self.delete_url)
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
         notes_count = Note.objects.count()
-        self.assertEqual(notes_count, self.NOTES_COUNT+1)
+        self.assertEqual(notes_count, self.NOTES_COUNT + 1)
 
     def test_author_can_edit_note(self):
         """Проверяет, что автор может редактировать свою заметку."""

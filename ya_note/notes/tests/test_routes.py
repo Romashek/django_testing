@@ -1,7 +1,6 @@
 from http import HTTPStatus
 
 from django.contrib.auth import get_user_model
-from django.test import TestCase
 from django.urls import reverse
 
 from .base_tests import BaseTestCase
@@ -17,8 +16,10 @@ class TestRoutes(BaseTestCase):
     def setUpTestData(cls):
         """Создает тестовые данные для всех тестов."""
         super().setUpTestData()
-        cls.author = User.objects.create_user(username='Автор', password='password')
-        cls.reader = User.objects.create_user(username='Читатель простой', password='password')
+        cls.author = User.objects.create_user(username='Автор',
+                                              password='password')
+        cls.reader = User.objects.create_user(username='Читатель простой',
+                                              password='password')
         cls.note3 = Note.objects.create(
             title='User Note',
             text='This is a note .',
