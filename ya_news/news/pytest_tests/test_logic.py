@@ -54,42 +54,45 @@ def test_user_cant_use_bad_words(not_author_client, news, get_detail_url):
 def test_author_can_delete_comment(author_client, news, comment,
                                    get_delete_url, get_detail_url):
     """Проверяет, что автор комментария может его удалить."""
+    commment_was = Comment.objects.count()
     delete_url = get_delete_url(news)
     response = author_client.delete(delete_url)
     assert response['Location'] == f'{get_detail_url(news)}#comments'
     comments_count = Comment.objects.count()
-    assert comments_count == 0
+    assert comments_count == commment_was - 1
 
 
 def test_user_cant_delete_comment_of_another_user(
         not_author_client, news, comment, get_delete_url):
-    delete_url = get_delete_url(news)
+    commment_was = Comment.objects.count()
+    delete_url = get_delete_url(comment)
     not_author_client.delete(delete_url)
     comments_count = Comment.objects.count()
-    assert comments_count == 1
+    assert comments_count == commment_was
 
 
 def test_author_can_edit_comment(
         author_client, comment, news, get_edit_url, get_detail_url):
-    edit_url = get_edit_url(news)
+    edit_url = get_edit_url(comment)
 
+    commment_was = Comment.objects.get(id=comment.id)
     response = author_client.post(edit_url, data=FORM_DATA)
     assert response['Location'] == f'{get_detail_url(news)}#comments'
 
     updated_comment = Comment.objects.get(id=comment.id)
 
     assert updated_comment.text == FORM_DATA['text']
-    assert updated_comment.author == author_client.user
-    assert updated_comment.news == news
+    assert updated_comment.author == commment_was.author
+    assert updated_comment.news == commment_was.news
 
 
 def test_user_cant_edit_comment_of_another_user(
         not_author_client, get_edit_url, comment, news, author_client):
+    commment_was = Comment.objects.get(id=comment.id)
     edit_url = get_edit_url(news)
-
     not_author_client.post(edit_url, data=FORM_DATA)
     updated_comment = Comment.objects.get(id=comment.id)
 
     assert comment.text == updated_comment.text
-    assert updated_comment.author == author_client.user
-    assert updated_comment.news == news
+    assert updated_comment.author == commment_was.author
+    assert updated_comment.news == commment_was.news

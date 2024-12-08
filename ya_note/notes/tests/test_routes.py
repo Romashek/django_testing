@@ -4,7 +4,6 @@ from django.contrib.auth import get_user_model
 from django.urls import reverse
 
 from .base_tests import BaseTestCase
-from notes.models import Note
 
 User = get_user_model()
 
@@ -12,40 +11,17 @@ User = get_user_model()
 class TestRoutes(BaseTestCase):
     """Тесты для проверки доступности маршрутов."""
 
-    @classmethod
-    def setUpTestData(cls):
-        """Создает тестовые данные для всех тестов."""
-        super().setUpTestData()
-        cls.author = User.objects.create_user(username='Автор',
-                                              password='password')
-        cls.reader = User.objects.create_user(username='Читатель простой',
-                                              password='password')
-        cls.note3 = Note.objects.create(
-            title='User Note',
-            text='This is a note .',
-            slug='123',
-            author=cls.author
-        )
-        cls.url_add = 'notes:add'
-        cls.url_home = 'notes:home'
-        cls.url_edit = 'notes:edit'
-        cls.url_done = 'notes:success'
-        cls.url_delete = 'notes:delete'
-        cls.url_list = 'notes:list'
-        cls.url_detail = 'notes:detail'
-
     def test_pages_availability(self):
         """Проверяет доступность страниц для анонимного пользователя."""
         urls = (
             self.url_home,
-            'users:login',
-            'users:logout',
-            'users:signup',
+            self.url_login,
+            self.url_logout,
+            self.url_signup,
         )
         for name in urls:
             with self.subTest(name=name):
-                url = reverse(name)
-                response = self.client.get(url)
+                response = self.client.get(name)
                 self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_auth_user_notes_done_add_access(self):
@@ -57,8 +33,7 @@ class TestRoutes(BaseTestCase):
         )
         for name in urls:
             with self.subTest(name=name):
-                url = reverse(name)
-                response = self.author_client.get(url)
+                response = self.author_client.get(name)
                 self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_availability_for_comment_edit_and_delete(self):
@@ -70,8 +45,7 @@ class TestRoutes(BaseTestCase):
             self.client.force_login(user)
             for name in (self.url_edit, self.url_delete, self.url_detail):
                 with self.subTest(user=user, name=name):
-                    url = reverse(name, args=(self.note3.slug,))
-                    response = self.client.get(url)
+                    response = self.client.get(name)
                     self.assertEqual(response.status_code, status)
 
     def test_redirect_for_anonymous_client(self):
@@ -79,17 +53,16 @@ class TestRoutes(BaseTestCase):
         login_url = reverse('users:login')
 
         urls = (
-            (self.url_edit, (self.note.slug,)),
-            (self.url_delete, (self.note.slug,)),
-            (self.url_add, None),
-            (self.url_detail, (self.note.slug,)),
-            (self.url_list, None),
-            (self.url_done, None),
+            (self.url_edit),
+            (self.url_delete),
+            (self.url_add),
+            (self.url_detail),
+            (self.url_list),
+            (self.url_done),
         )
 
-        for name, args in urls:
+        for name in urls:
             with self.subTest(name=name):
-                url = reverse(name, args=args)
-                redirect_url = f'{login_url}?next={url}'
-                response = self.client.get(url)
+                redirect_url = f'{login_url}?next={name}'
+                response = self.client.get(name)
                 self.assertRedirects(response, redirect_url)

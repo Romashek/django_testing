@@ -94,20 +94,33 @@ def get_detail_url():
 
 @pytest.fixture
 def get_delete_url():
-    def _get_delete_url(news):
-        return reverse('news:delete', args=(news.id,))
+    def _get_delete_url(comment):
+        return reverse('news:delete', args=(comment.id,))
     return _get_delete_url
 
 
 @pytest.fixture
 def get_edit_url():
-    def _get_edit_url(news):
-        return reverse('news:edit', args=(news.id,))
+    def _get_edit_url(comment):
+        return reverse('news:edit', args=(comment.id,))
     return _get_edit_url
 
 
 @pytest.fixture
-def get_home_url():
-    def _get_home_url():
-        return reverse('news:home')
-    return _get_home_url
+def get_home_url(news):
+    return reverse('news:home')
+
+
+@pytest.fixture
+def login_url():
+    return reverse('users:login')
+
+
+@pytest.fixture
+def logout_url():
+    return reverse('users:logout')
+
+
+@pytest.fixture
+def signup_url():
+    return reverse('users:signup')
