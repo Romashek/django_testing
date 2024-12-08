@@ -8,7 +8,7 @@ User = get_user_model()
 
 
 class BaseTestCase(TestCase):
-    """Базовый класс для тестов заметок."""
+
     TEXT = 'This is the note.'
     NEW_TEXT = 'thats test text'
 

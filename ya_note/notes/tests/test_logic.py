@@ -1,14 +1,11 @@
 from http import HTTPStatus
 
-from django.contrib.auth import get_user_model
 from django.urls import reverse
 from pytils.translit import slugify
 
 from .base_tests import BaseTestCase
 from notes.models import Note
 from notes.forms import WARNING
-
-User = get_user_model()
 
 
 class TestNoteCreation(BaseTestCase):

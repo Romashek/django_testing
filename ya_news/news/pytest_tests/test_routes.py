@@ -1,11 +1,12 @@
 from http import HTTPStatus
-import pytest
 
+import pytest
 from django.urls import reverse
 from pytest_django.asserts import assertRedirects
 
+pytestmark = pytest.mark.django_db
 
-@pytest.mark.django_db
+
 @pytest.mark.parametrize(
     'url_fixture',
     (pytest.lazy_fixture('get_home_url'), pytest.lazy_fixture('login_url'),
@@ -16,7 +17,6 @@ def test_pages_availability_for_anonymous_user(client, url_fixture):
     assert response.status_code == HTTPStatus.OK
 
 
-@pytest.mark.django_db
 def test_news_detail_page_accessible_to_anonymous_user(client,
                                                        get_detail_url, news):
     url = get_detail_url(news)
@@ -25,11 +25,12 @@ def test_news_detail_page_accessible_to_anonymous_user(client,
 
 
 @pytest.mark.parametrize(
-    'name',
-    ('news:delete', 'news:edit'),
+    'url_fixture',
+    (pytest.lazy_fixture('get_delete_url'),
+     pytest.lazy_fixture('get_edit_url')),
 )
-def test_delete_edit_to_author(comment, author_client, name):
-    url = reverse(name, args=(comment.id,))
+def test_delete_edit_to_author(comment, author_client, url_fixture):
+    url = url_fixture(comment)
     response = author_client.get(url)
     assert response.status_code == HTTPStatus.OK
 

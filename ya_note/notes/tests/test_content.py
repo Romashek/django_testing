@@ -1,16 +1,9 @@
-from django.urls import reverse
-
-from notes.tests.base_tests import BaseTestCase
 from notes.forms import NoteForm
+from notes.tests.base_tests import BaseTestCase
 
 
 class TestContent(BaseTestCase):
     """Тесты для проверки контента заметок."""
-    @classmethod
-    def setUpTestData(cls):
-        super().setUpTestData()
-        cls.url_add = ('notes:add')
-        cls.url_edit = ('notes:edit')
 
     def test_notes_list_page_includes_note_in_context(self):
         response = self.author_client.get(self.url_list)
@@ -24,12 +17,11 @@ class TestContent(BaseTestCase):
 
     def test_form_in_add_edit(self):
         urls = (
-            (self.url_add, None),
-            (self.url_edit, (self.note.slug,)),
+            (self.url_add),
+            (self.edit_url),
         )
-        for name, args in urls:
+        for name in urls:
             with self.subTest(name=name):
-                url = reverse(name, args=args)
-                response = self.author_client.get(url)
+                response = self.author_note.get(name)
                 self.assertIn('form', response.context)
                 self.assertIsInstance(response.context['form'], NoteForm)

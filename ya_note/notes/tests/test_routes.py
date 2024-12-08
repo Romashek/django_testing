@@ -1,11 +1,7 @@
 from http import HTTPStatus
 
-from django.contrib.auth import get_user_model
-from django.urls import reverse
 
 from .base_tests import BaseTestCase
-
-User = get_user_model()
 
 
 class TestRoutes(BaseTestCase):
@@ -38,19 +34,18 @@ class TestRoutes(BaseTestCase):
 
     def test_availability_for_comment_edit_and_delete(self):
         users_statuses = (
-            (self.author, HTTPStatus.OK),
-            (self.reader, HTTPStatus.NOT_FOUND),
+            (self.author_note, HTTPStatus.OK),
+            (self.reader_note, HTTPStatus.NOT_FOUND),
         )
         for user, status in users_statuses:
-            self.client.force_login(user)
             for name in (self.url_edit, self.url_delete, self.url_detail):
                 with self.subTest(user=user, name=name):
-                    response = self.client.get(name)
+                    response = user.get(name)
                     self.assertEqual(response.status_code, status)
 
     def test_redirect_for_anonymous_client(self):
         """Проверяет редиректы для анонимных пользователей."""
-        login_url = reverse('users:login')
+        login_url = self.url_login
 
         urls = (
             (self.url_edit),
